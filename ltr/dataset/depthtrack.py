@@ -44,15 +44,17 @@ class DepthTrack(BaseVideoDataset):
 
         self.seq_per_class, self.class_list = self._build_class_list()
         self.class_list.sort()
+        print(self.class_list)
+        
         self.class_to_id = {cls_name: cls_id for cls_id, cls_name in enumerate(self.class_list)}
 
     def _build_sequence_list(self):
 
         ltr_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
         file_path = os.path.join(ltr_path, 'data_specs', 'depthtrack_%s.txt'%self.split)
-        sequence_list = pandas.read_csv(file_path, header=None, squeeze=True).values.tolist()
-        print(sequence_list)
-        return None
+        sequence_list = pandas.read_csv(file_path, header=None).squeeze("columns").values.tolist()
+        # print(sequence_list)
+        # return None
         # sequence_list = os.listdir(self.root)
 
         return sequence_list
@@ -61,7 +63,7 @@ class DepthTrack(BaseVideoDataset):
         seq_per_class = {}
         class_list = []
         for seq_id, seq_name in enumerate(self.sequence_list):
-            class_name = seq_name.split('-')[0]
+            class_name = seq_name.split('_')[0]
 
             if class_name not in class_list:
                 class_list.append(class_name)

@@ -24,8 +24,8 @@ def run(settings):
 
     input_dtype = 'rgbcolormap' # 'rgb3d' # 'rgbcolormap'
     # Train datasets
-    coco_train = MSCOCOSeq_depth(settings.env.cocodepth_dir, dtype=input_dtype)
-    lasot_depth_train = Lasot_depth(root=settings.env.lasotdepth_dir, dtype=input_dtype)
+    # coco_train = MSCOCOSeq_depth(settings.env.cocodepth_dir, dtype=input_dtype)
+    # lasot_depth_train = Lasot_depth(root=settings.env.lasotdepth_dir, dtype=input_dtype)
     depthtrack_train = DepthTrack(root=settings.env.depthtrack_dir, split='train', dtype=input_dtype)
 
     # Validation datasets
@@ -65,7 +65,7 @@ def run(settings):
                                                     joint_transform=transform_joint)
 
     # The sampler for training
-    dataset_train = sampler.ATOMSampler([lasot_depth_train, depthtrack_train, coco_train], [1,1,1],
+    dataset_train = sampler.ATOMSampler([depthtrack_train], [1],
                                 samples_per_epoch=1000*settings.batch_size, max_gap=50, processing=data_processing_train)
 
     # The loader for training

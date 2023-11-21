@@ -12,7 +12,7 @@ def run(settings):
     # Most common settings are assigned in the settings struct
     settings.description = 'ATOM IoUNet with default settings, for DeT Tracker.'
     settings.batch_size = 64
-    settings.num_workers = 8
+    settings.num_workers = 1
     settings.print_interval = 1
     settings.normalize_mean = [0.485, 0.456, 0.406]
     settings.normalize_std = [0.229, 0.224, 0.225]
@@ -81,7 +81,7 @@ def run(settings):
                            shuffle=False, drop_last=True, epoch_interval=5, stack_dim=1)
 
     # Create network and actor
-    net = atom_models.atom_resnet18_DeT(backbone_pretrained=True, merge_type='max')
+    net = atom_models.atom_resnet18_DeT(backbone_pretrained=False, merge_type='max')
     objective = nn.MSELoss()
     actor = actors.AtomActor(net=net, objective=objective)
 

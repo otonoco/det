@@ -51,7 +51,8 @@ class DepthTrack(BaseVideoDataset):
         ltr_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
         file_path = os.path.join(ltr_path, 'data_specs', 'depthtrack_%s.txt'%self.split)
         sequence_list = pandas.read_csv(file_path, header=None, squeeze=True).values.tolist()
-
+        print(sequence_list)
+        return None
         # sequence_list = os.listdir(self.root)
 
         return sequence_list

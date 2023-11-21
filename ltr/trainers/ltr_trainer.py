@@ -46,7 +46,7 @@ class LTRTrainer(BaseTrainer):
 
         self.actor.train(loader.training)
         torch.set_grad_enabled(loader.training)
-
+        print(type(loader))
         self._init_timing()
 
         for i, data in enumerate(loader, 1):

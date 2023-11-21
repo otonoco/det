@@ -4,7 +4,6 @@ def local_env_settings():
     settings = EnvSettings()
 
     # Set your local paths here.
-    /mnt/data0-nfs/sl53/det/CDTB/seqscd 
 
     settings.cdtb_path = '/mnt/data0-nfs/sl53/det/results/CDTB/seqs'
     settings.cdtb_st_path = '/mnt/data0-nfs/sl53/det/results/CDTB-ST/seqs'

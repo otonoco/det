@@ -76,7 +76,6 @@ class LTRTrainer(BaseTrainer):
     def train_epoch(self):
         """Do one epoch for each loader."""
         for loader in self.loaders:
-            print(type(loader))
             if self.epoch % loader.epoch_interval == 0:
                 self.cycle_dataset(loader)
 

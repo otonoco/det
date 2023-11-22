@@ -66,14 +66,14 @@ def run(settings):
 
     # The sampler for training
     dataset_train = sampler.ATOMSampler([depthtrack_train], [1],
-                                samples_per_epoch=200*settings.batch_size, max_gap=50, processing=data_processing_train)
+                                samples_per_epoch=10*settings.batch_size, max_gap=50, processing=data_processing_train)
 
     # The loader for training
     loader_train = LTRLoader('train', dataset_train, training=True, batch_size=settings.batch_size, num_workers=settings.num_workers,
                              shuffle=True, drop_last=True, stack_dim=1)
 
     # The sampler for validation
-    dataset_val = sampler.ATOMSampler([depthtrack_val], [1], samples_per_epoch=200*settings.batch_size, max_gap=50,
+    dataset_val = sampler.ATOMSampler([depthtrack_val], [1], samples_per_epoch=10*settings.batch_size, max_gap=50,
                                       processing=data_processing_val)
 
     # The loader for validation

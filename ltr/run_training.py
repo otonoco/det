@@ -48,6 +48,7 @@ def main():
 
     args = parser.parse_args()
 
+    torch.hub.set_dir("./.cache/torch/hub")
     run_training(args.train_module, args.train_name, args.cudnn_benchmark)
 
 

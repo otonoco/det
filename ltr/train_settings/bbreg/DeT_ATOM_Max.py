@@ -23,25 +23,25 @@ def run(settings):
     settings.scale_jitter_factor = {'train': 0, 'test': 0.5}
 
     input_dtype = 'rgbcolormap' # 'rgb3d' # 'rgbcolormap'
+
     # Train datasets
-    # coco_train = MSCOCOSeq_depth(settings.env.cocodepth_dir, dtype=input_dtype)
     # lasot_depth_train = Lasot_depth(root=settings.env.lasotdepth_dir, dtype=input_dtype)
+    # coco_train = MSCOCOSeq_depth(root=settings.env.cocodepth_dir, split="train", dtype=input_dtype)
     depthtrack_train = DepthTrack(root=settings.env.depthtrack_dir, split='train', dtype=input_dtype)
 
     # Validation datasets
     # cdtb_val = CDTB(settings.env.cdtb_dir, split='val', dtype='rgbcolormap')
+    # coco_val = MSCOCOSeq_depth(root=settings.env.cocodepth_dir, split="val", dtype=input_dtype)
     depthtrack_val = DepthTrack(root=settings.env.depthtrack_dir, split='val', dtype=input_dtype)
 
     # The joint augmentation transform, that is applied to the pairs jointly
     transform_joint = tfm.Transform(tfm.ToGrayscale(probability=0.05))
 
     # The augmentation transform applied to the training set (individually to each image in the pair)
-    transform_train = tfm.Transform(tfm.ToTensorAndJitter(0.2),
-                                    tfm.Normalize(mean=settings.normalize_mean, std=settings.normalize_std))
+    transform_train = tfm.Transform(tfm.ToTensorAndJitter(0.2), tfm.Normalize(mean=settings.normalize_mean, std=settings.normalize_std))
 
     # The augmentation transform applied to the validation set (individually to each image in the pair)
-    transform_val = tfm.Transform(tfm.ToTensor(),
-                                  tfm.Normalize(mean=settings.normalize_mean, std=settings.normalize_std))
+    transform_val = tfm.Transform(tfm.ToTensor(), tfm.Normalize(mean=settings.normalize_mean, std=settings.normalize_std))
 
     # Data processing to do on the training pairs
     proposal_params = {'min_iou': 0.1, 'boxes_per_frame': 16, 'sigma_factor': [0.01, 0.05, 0.1, 0.2, 0.3]}
@@ -65,20 +65,16 @@ def run(settings):
                                                     joint_transform=transform_joint)
 
     # The sampler for training
-    dataset_train = sampler.ATOMSampler([depthtrack_train], [1],
-                                samples_per_epoch=1000*settings.batch_size, max_gap=50, processing=data_processing_train)
+    dataset_train = sampler.ATOMSampler([depthtrack_train], [1], samples_per_epoch=1000*settings.batch_size, max_gap=50, processing=data_processing_train)
 
     # The loader for training
-    loader_train = LTRLoader('train', dataset_train, training=True, batch_size=settings.batch_size, num_workers=settings.num_workers,
-                             shuffle=True, drop_last=True, stack_dim=1)
+    loader_train = LTRLoader('train', dataset_train, training=True, batch_size=settings.batch_size, num_workers=settings.num_workers, shuffle=True, drop_last=True, stack_dim=1)
 
     # The sampler for validation
-    dataset_val = sampler.ATOMSampler([depthtrack_val], [1], samples_per_epoch=1000*settings.batch_size, max_gap=50,
-                                      processing=data_processing_val)
+    dataset_val = sampler.ATOMSampler([depthtrack_val], [1, 1], samples_per_epoch=1000*settings.batch_size, max_gap=50, processing=data_processing_val)
 
     # The loader for validation
-    loader_val = LTRLoader('val', dataset_val, training=False, batch_size=settings.batch_size, num_workers=settings.num_workers,
-                           shuffle=False, drop_last=True, epoch_interval=5, stack_dim=1)
+    loader_val = LTRLoader('val', dataset_val, training=False, batch_size=settings.batch_size, num_workers=settings.num_workers, shuffle=False, drop_last=True, epoch_interval=8, stack_dim=1)
 
     # Create network and actor
     net = atom_models.atom_resnet18_DeT(backbone_pretrained=True, merge_type='max')

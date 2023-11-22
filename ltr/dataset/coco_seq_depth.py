@@ -33,7 +33,7 @@ class MSCOCOSeq_depth(BaseVideoDataset):
     Note: You also have to install the coco pythonAPI from https://github.com/cocodataset/cocoapi.
     """
 
-    def __init__(self, root=None, image_loader=jpeg4py_loader, data_fraction=None, split="train", version="2014", dtype='depth'):
+    def __init__(self, root=None, image_loader=jpeg4py_loader, data_fraction=None, split="train", version="2017", dtype='depth'):
         """
         args:
             root - path to the coco dataset.
@@ -131,7 +131,7 @@ class MSCOCOSeq_depth(BaseVideoDataset):
     def _get_frames(self, seq_id, depth_threshold=None, bbox=None):
 
         color_path = self.coco_set.loadImgs([self.coco_set.anns[self.sequence_list[seq_id]]['image_id']])[0]['file_name']
-        depth_path = rgb_path[:-4] + '.png'
+        depth_path = color_path[:-4] + '.png'
 
         color_path = os.path.join(self.img_path, 'color', color_path)
         depth_path = os.path.join(self.img_path, 'depth', depth_path)

@@ -66,7 +66,7 @@ def run(settings):
 
     # The sampler for training
     dataset_train = sampler.ATOMSampler([depthtrack_train], [1],
-                                samples_per_epoch=1000*settings.batch_size, max_gap=50, processing=data_processing_train)
+                                samples_per_epoch=500*settings.batch_size, max_gap=50, processing=data_processing_train)
 
     # The loader for training
     loader_train = LTRLoader('train', dataset_train, training=True, batch_size=settings.batch_size, num_workers=settings.num_workers,

@@ -46,7 +46,7 @@ class LTRTrainer(BaseTrainer):
 
         self.actor.train(loader.training)
         torch.set_grad_enabled(loader.training)
-        print(type(loader))
+        
         self._init_timing()
 
         for i, data in enumerate(loader, 1):
@@ -76,6 +76,7 @@ class LTRTrainer(BaseTrainer):
     def train_epoch(self):
         """Do one epoch for each loader."""
         for loader in self.loaders:
+            print(type(loader))
             if self.epoch % loader.epoch_interval == 0:
                 self.cycle_dataset(loader)
 

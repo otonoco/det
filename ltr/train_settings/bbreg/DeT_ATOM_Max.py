@@ -12,7 +12,7 @@ def run(settings):
     # Most common settings are assigned in the settings struct
     settings.description = 'ATOM IoUNet with default settings, for DeT Tracker.'
     settings.batch_size = 64
-    settings.num_workers = 8
+    settings.num_workers = 2
     settings.print_interval = 1
     settings.normalize_mean = [0.485, 0.456, 0.406]
     settings.normalize_std = [0.229, 0.224, 0.225]

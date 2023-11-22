@@ -71,7 +71,7 @@ def run(settings):
     loader_train = LTRLoader('train', dataset_train, training=True, batch_size=settings.batch_size, num_workers=settings.num_workers, shuffle=True, drop_last=True, stack_dim=1)
 
     # The sampler for validation
-    dataset_val = sampler.ATOMSampler([depthtrack_val], [1, 1], samples_per_epoch=1000*settings.batch_size, max_gap=50, processing=data_processing_val)
+    dataset_val = sampler.ATOMSampler([depthtrack_val], [1], samples_per_epoch=1000*settings.batch_size, max_gap=50, processing=data_processing_val)
 
     # The loader for validation
     loader_val = LTRLoader('val', dataset_val, training=False, batch_size=settings.batch_size, num_workers=settings.num_workers, shuffle=False, drop_last=True, epoch_interval=8, stack_dim=1)

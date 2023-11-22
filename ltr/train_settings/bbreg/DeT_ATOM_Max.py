@@ -12,7 +12,7 @@ def run(settings):
     # Most common settings are assigned in the settings struct
     settings.description = 'ATOM IoUNet with default settings, for DeT Tracker.'
     settings.batch_size = 64
-    settings.num_workers = 1
+    settings.num_workers = 8
     settings.print_interval = 1
     settings.normalize_mean = [0.485, 0.456, 0.406]
     settings.normalize_std = [0.229, 0.224, 0.225]
@@ -66,14 +66,14 @@ def run(settings):
 
     # The sampler for training
     dataset_train = sampler.ATOMSampler([depthtrack_train], [1],
-                                samples_per_epoch=500*settings.batch_size, max_gap=50, processing=data_processing_train)
+                                samples_per_epoch=200*settings.batch_size, max_gap=50, processing=data_processing_train)
 
     # The loader for training
     loader_train = LTRLoader('train', dataset_train, training=True, batch_size=settings.batch_size, num_workers=settings.num_workers,
                              shuffle=True, drop_last=True, stack_dim=1)
 
     # The sampler for validation
-    dataset_val = sampler.ATOMSampler([depthtrack_val], [1], samples_per_epoch=500*settings.batch_size, max_gap=50,
+    dataset_val = sampler.ATOMSampler([depthtrack_val], [1], samples_per_epoch=200*settings.batch_size, max_gap=50,
                                       processing=data_processing_val)
 
     # The loader for validation
@@ -81,7 +81,7 @@ def run(settings):
                            shuffle=False, drop_last=True, epoch_interval=5, stack_dim=1)
 
     # Create network and actor
-    net = atom_models.atom_resnet18_DeT(backbone_pretrained=False, merge_type='max')
+    net = atom_models.atom_resnet18_DeT(backbone_pretrained=True, merge_type='max')
     objective = nn.MSELoss()
     actor = actors.AtomActor(net=net, objective=objective)
 

@@ -20,4 +20,4 @@ class EnvironmentSettings:
         self.depthtrack_dir = '/mnt/data0-nfs/sl53/det_dataset/DepthTrack/train/'
         self.trackingnetdepth_dir = '//mnt/data0-nfs/sl53/det_dataset/EstimatedDepth/TrackingNet/'
         self.lasotdepth_dir = '/mnt/data0-nfs/sl53/det_dataset/EstimatedDepth/LaSOT/'
-        self.cocodepth_dir = '/mnt/data0-nfs/sl53/det_dataset/EstimatedDepth/COCO/'
+        self.cocodepth_dir = '/mnt/data0-nfs/sl53/det_dataset/COCO/'

@@ -43,6 +43,7 @@ class DepthTrack(BaseVideoDataset):
         self.sequence_list = self._build_sequence_list()
 
         self.seq_per_class, self.class_list = self._build_class_list()
+        print(self.seq_per_class, self.class_list)
         self.class_list.sort()
         
         self.class_to_id = {cls_name: cls_id for cls_id, cls_name in enumerate(self.class_list)}

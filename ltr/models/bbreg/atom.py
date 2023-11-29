@@ -116,8 +116,6 @@ class ATOMnet_DeT(nn.Module):
         else:
             return self.feature_extractor(im, layers)
 
-        # return self.feature_extractor(im, layers)
-
     def extract_features(self, im, layers):
         dims = im.shape
         # return self.feature_extractor(im, layers)

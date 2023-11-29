@@ -30,8 +30,8 @@ def run(settings):
 
     input_dtype = 'rgbcolormap' # 'rgb3d' # 'rgbcolormap'
     # Train datasets
-    coco_train = MSCOCOSeq_depth(settings.env.cocodepth_dir, dtype=input_dtype)
-    lasot_depth_train = Lasot_depth(root=settings.env.lasotdepth_dir, dtype=input_dtype)
+    coco_train = MSCOCOSeq_depth(settings.env.cocodepth_dir, split="train", dtype=input_dtype)
+    # lasot_depth_train = Lasot_depth(root=settings.env.lasotdepth_dir, dtype=input_dtype)
     depthtrack_train = DepthTrack(root=settings.env.depthtrack_dir, split='train', dtype=input_dtype)
     # depthtrack_horizontal_train = DepthTrack(root=settings.env.depthtrack_horizontal_dir, dtype='rgbcolormap')
     # depthtrack_vertical_train = DepthTrack(root=settings.env.depthtrack_vertical_dir, dtype='rgbcolormap')

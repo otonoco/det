@@ -26,13 +26,17 @@ class DiMPnet_DeT(nn.Module):
         super().__init__()
 
         self.feature_extractor = feature_extractor
+        
+        # Add:
         self.feature_extractor_depth = feature_extractor_depth
+
         self.classifier = classifier
         self.bb_regressor = bb_regressor
         self.classification_layer = [classification_layer] if isinstance(classification_layer, str) else classification_layer
         self.bb_regressor_layer = bb_regressor_layer
         self.output_layers = sorted(list(set(self.classification_layer + self.bb_regressor_layer)))
 
+        # Add:
         self.merge_type = merge_type
         if self.merge_type == 'conv':
             self.merge_layer2 = nn.Conv2d(1024, 512, (1,1))
@@ -78,6 +82,7 @@ class DiMPnet_DeT(nn.Module):
         feat = OrderedDict({l: backbone_feat[l] for l in self.classification_layer})
         if len(self.classification_layer) == 1:
             return feat[self.classification_layer[0]]
+        return feat
 
     def get_backbone_bbreg_feat(self, backbone_feat):
         return [backbone_feat[l] for l in self.bb_regressor_layer]              # Song : layer2 and layer 3
@@ -117,7 +122,6 @@ class DiMPnet_DeT(nn.Module):
         return feat
 
     def extract_backbone_features(self, im, layers=None):
-
         if layers is None:
             layers = self.output_layers
 
@@ -125,10 +129,7 @@ class DiMPnet_DeT(nn.Module):
         if dims[1] == 6:
             color_feat = self.feature_extractor(im[:, :3, :, :], layers)
             depth_feat = self.feature_extractor_depth(im[:, 3:, :, :], layers)
-
-            merged_feat = self.merge(color_feat, depth_feat)
-            # self.id += 1
-            return merged_feat
+            return self.merge(color_feat, depth_feat)
         else:
             return self.feature_extractor(im, layers)
 
@@ -150,6 +151,16 @@ class DiMPnet_DeT(nn.Module):
             all_feat = self.merge(color_feat, depth_feat)
         else:
             all_feat = self.feature_extractor(im, backbone_layers)
+        all_feat['classification'] = self.extract_classification_feat(all_feat)
+        return OrderedDict({l: all_feat[l] for l in layers})
+    
+    def extract_features(self, im, layers=None):
+        if layers is None:
+            layers = self.bb_regressor_layer + ['classification']
+        if 'classification' not in layers:
+            return self.feature_extractor(im, layers)
+        backbone_layers = sorted(list(set([l for l in layers + self.classification_layer if l != 'classification'])))
+        all_feat = self.feature_extractor(im, backbone_layers)
         all_feat['classification'] = self.extract_classification_feat(all_feat)
         return OrderedDict({l: all_feat[l] for l in layers})
 

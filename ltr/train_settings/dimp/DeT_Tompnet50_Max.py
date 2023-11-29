@@ -158,4 +158,4 @@ def run(settings):
     trainer = LTRTrainer(actor, [loader_train, loader_val], optimizer, settings, lr_scheduler,
                          freeze_backbone_bn_layers=settings.freeze_backbone_bn_layers)
 
-    trainer.train(settings.num_epochs, load_latest=True, fail_safe=True)
+    trainer.train(100, load_latest=True, fail_safe=True)

@@ -1,4 +1,5 @@
 import os
+import torch.nn as nn
 from collections import OrderedDict
 from ltr.trainers import BaseTrainer
 from ltr.admin.stats import AverageMeter, StatValue
@@ -6,9 +7,13 @@ from ltr.admin.tensorboard import TensorboardWriter
 import torch
 import time
 
+def freeze_batchnorm_layers(net):
+    for module in net.modules():
+        if isinstance(module, nn.BatchNorm2d):
+            module.eval()
 
 class LTRTrainer(BaseTrainer):
-    def __init__(self, actor, loaders, optimizer, settings, lr_scheduler=None):
+    def __init__(self, actor, loaders, optimizer, settings, lr_scheduler=None, freeze_backbone_bn_layers=False):
         """
         args:
             actor - The actor for training the network
@@ -31,6 +36,8 @@ class LTRTrainer(BaseTrainer):
 
         self.move_data_to_gpu = getattr(settings, 'move_data_to_gpu', True)
 
+        self.freeze_backbone_bn_layers = freeze_backbone_bn_layers
+
     def _set_default_settings(self):
         # Dict of all default values
         default = {'print_interval': 10,
@@ -46,6 +53,9 @@ class LTRTrainer(BaseTrainer):
 
         self.actor.train(loader.training)
         torch.set_grad_enabled(loader.training)
+
+        if self.freeze_backbone_bn_layers:
+            freeze_batchnorm_layers(self.actor.net.feature_extractor)
         
         self._init_timing()
 

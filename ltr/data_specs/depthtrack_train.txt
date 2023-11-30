@@ -79,7 +79,6 @@ guitarbag_indoor
 gymring_wild
 hand02_indoor
 hat01_indoor
-hat02_indoor_320
 hat03_indoor
 hat04_indoor
 human01_indoor
@@ -110,13 +109,11 @@ mushroom05_indoor
 notebook02_indoor
 notebook03_indoor
 paintbottle_indoor
-painting_indoor_320
 parkingsign_wild
 pigeon03_wild
 pigeon06_wild
 pigeon07_wild
 pine01_indoor
-pine02_wild_320
 shoes01_indoor
 shoes03_indoor
 skateboard01_indoor
@@ -136,7 +133,6 @@ toy01_indoor
 toy04_indoor
 toy05_indoor
 toy06_indoor
-toy07_indoor_320
 toy08_indoor
 toy10_indoor
 toydog_indoor

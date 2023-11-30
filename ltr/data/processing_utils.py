@@ -155,6 +155,7 @@ def sample_target(im, target_bb, search_area_factor, output_sz=None, mask=None):
             return im_crop_padded, 1.0
         return im_crop_padded, 1.0, mask_crop_padded
 
+
 def transform_image_to_crop(box_in: torch.Tensor, box_extract: torch.Tensor, resize_factor: float,
                             crop_sz: torch.Tensor) -> torch.Tensor:
     """ Transform the box co-ordinates from the original image co-ordinates to the co-ordinates of the cropped image
@@ -307,13 +308,7 @@ def sample_target_adaptive(im, target_bb, search_area_factor, output_sz, mode: s
         mask_crop = mask[y1 + y1_pad:y2 - y2_pad, x1 + x1_pad:x2 - x2_pad]
 
     # Pad
-    dim = list(im_crop.shape)
-    if dim[2] == 6:
-        color_crop_padded = cv.copyMakeBorder(im_crop[:, :, :3], y1_pad, y2_pad, x1_pad, x2_pad, cv.BORDER_REPLICATE)
-        depth_crop_padded = cv.copyMakeBorder(im_crop[:, :, 3:], y1_pad, y2_pad, x1_pad, x2_pad, cv.BORDER_REPLICATE)
-        im_crop_padded = cv.merge((color_crop_padded, depth_crop_padded))
-    else:
-        im_crop_padded = cv.copyMakeBorder(im_crop, y1_pad, y2_pad, x1_pad, x2_pad, cv.BORDER_REPLICATE)
+    im_crop_padded = cv.copyMakeBorder(im_crop, y1_pad, y2_pad, x1_pad, x2_pad, cv.BORDER_REPLICATE)
 
     if mask is not None:
         mask_crop_padded = F.pad(mask_crop, pad=(x1_pad, x2_pad, y1_pad, y2_pad), mode='constant', value=0)
@@ -331,6 +326,44 @@ def sample_target_adaptive(im, target_bb, search_area_factor, output_sz, mode: s
         return im_out, crop_box
     else:
         return im_out, crop_box, mask_out
+
+
+def sample_target_from_crop_region(im, crop_box, output_sz):
+    """ Extracts a crop of the image according to the crop box with the specified output size.
+
+        args:
+            im - Input numpy image to crop.
+            crop_box - crop box [x, y, w, h]
+            output_sz - Size to which the extracted crop is resized (always square) or tuple.
+
+        returns:
+            numpy image - Extracted crop.
+    """
+    if isinstance(output_sz, (float, int)):
+        output_sz = (output_sz, output_sz)
+    output_sz = torch.Tensor(output_sz)
+
+    crop_box = crop_box.int()
+    x1, y1, w1, h1 = crop_box.tolist()
+    x2 = x1 + w1
+    y2 = y1 + h1
+
+    x1_pad = max(0, -x1)
+    x2_pad = max(x2 - im.shape[1] + 1, 0)
+
+    y1_pad = max(0, -y1)
+    y2_pad = max(y2 - im.shape[0] + 1, 0)
+
+    # Crop target
+    im_crop = im[y1 + y1_pad:y2 - y2_pad, x1 + x1_pad:x2 - x2_pad, :]
+
+    # Pad
+    im_crop_padded = cv.copyMakeBorder(im_crop, y1_pad, y2_pad, x1_pad, x2_pad, cv.BORDER_REPLICATE)
+
+    # Resize image
+    im_out = cv.resize(im_crop_padded, tuple(output_sz.long().tolist()))
+
+    return im_out
 
 
 def crop_and_resize(im, box, crop_bb, output_sz, mask=None):
@@ -462,97 +495,6 @@ def target_image_crop(frames, box_extract, box_gt, search_area_factor, output_sz
         return frames_crop, box_crop
     else:
         return frames_crop, box_crop, masks_crop
-
-def template_crop_and_resize(im, crop_bb, output_sz, mask=None):
-    '''
-    Song , to crop the template images with the crop_bb,
-        and then to resize them into output_size (a square)
-    '''
-
-    if isinstance(output_sz, (float, int)):
-        output_sz = (output_sz, output_sz)
-
-    im_h = im.shape[0]
-    im_w = im.shape[1]
-
-    if crop_bb[2] < 1 or crop_bb[3] < 1:
-        print('current crop_bb: ', crop_bb)
-        raise Exception('Too small bounding box.')
-
-    x1 = int(crop_bb[0])
-    x2 = int(crop_bb[0] + crop_bb[2])
-
-    y1 = int(crop_bb[1])
-    y2 = int(crop_bb[1] + crop_bb[3])
-
-    # make sure x1y1, x2y2 are inside the images
-    x1_pad = max(0, -x1)
-    x2_pad = max(x2 - im.shape[1] + 1, 0)
-
-    y1_pad = max(0, -y1)
-    y2_pad = max(y2 - im.shape[0] + 1, 0)
-
-    # Crop target
-    im_crop = im[y1 + y1_pad:y2 - y2_pad, x1 + x1_pad:x2 - x2_pad, :]
-
-    if mask is not None:
-        mask_crop = mask[y1 + y1_pad:y2 - y2_pad, x1 + x1_pad:x2 - x2_pad]
-
-    # Pad # Song's understanding : make sure the padded image are in the same shape of cropped bb
-    im_crop_padded = cv.copyMakeBorder(im_crop, y1_pad, y2_pad, x1_pad, x2_pad, cv.BORDER_REPLICATE)
-
-    # Song, do we need to pad the crop into a square ??
-
-    if mask is not None:
-        mask_crop_padded = F.pad(mask_crop, pad=(x1_pad, x2_pad, y1_pad, y2_pad), mode='constant', value=0)
-
-    # Resize image
-    im_out = cv.resize(im_crop_padded, output_sz)
-
-    if mask is not None:
-        mask_out = F.interpolate(mask_crop_padded[None, None], (output_sz[1], output_sz[0]), mode='nearest')[0, 0]
-
-    if mask is None:
-        return im_out
-    else:
-        return im_out, mask_out
-
-def template_image_crop(frames, boxes, output_sz, masks=None):
-    """ For each frame in frames, extracts a square crop centered at box_extract, of area search_area_factor^2
-    times box_extract area. If the crop area contains regions outside the image, it is shifted / shrunk so that it
-    completely fits inside the image. The extracted crops are then resized to output_sz. Further, the co-ordinates of
-    the box box_gt are transformed to the image crop co-ordinates
-
-    args:
-        frames - list of frames
-
-        box_gt - list of boxes of same length as frames. The co-ordinates of these boxes are transformed from
-                    image co-ordinates to the crop co-ordinates
-
-        output_sz - The size to which the extracted crops are resized
-        mode - If 'replicate', the boundary pixels are replicated in case the search region crop goes out of image.
-               If 'inside', the search region crop is shifted/shrunk to fit completely inside the image.
-               If 'inside_major', the search region crop is shifted/shrunk to fit completely inside one axis of the image.
-        masks - Optional masks to apply the same crop.
-
-    returns:
-        list - list of image crops, resized into
-        """
-
-    if isinstance(output_sz, (float, int)):
-        output_sz = (output_sz, output_sz)
-
-    if masks is None:
-        frames_crop = [template_crop_and_resize(f, a, output_sz) for f, a in zip(frames, boxes)]
-    else:
-        frame_crops_masks = [template_crop_and_resize(f, a, output_sz, mask=m) for f, a, m in zip(frames, boxes, masks)]
-
-        frames_crop, masks_crop = zip(*frame_crops_masks)
-
-    if masks is None:
-        return frames_crop
-    else:
-        return frames_crop, masks_crop
 
 
 def iou(reference, proposals):
@@ -812,3 +754,43 @@ def sample_box_gmm(mean_box, proposal_sigma, gt_sigma=None, num_samples=1, add_m
         gt_density = torch.cat((torch.Tensor([1]), gt_density))
 
     return proposals, proposal_density, gt_density
+
+
+def find_local_maxima(scores, th, ks):
+    """Find local maxima in a heat map.
+        args:
+            scores - heat map to find the local maxima in.
+            th - threshold that defines the minamal value needed to be considered as a local maximum.
+            ks = local neighbourhood (kernel size) specifiying the minimal distance between two maxima.
+
+        returns:
+            coordinates and values of the local maxima.
+    """
+    ndims = scores.ndim
+
+    if ndims == 2:
+        scores = scores.view(1, 1, scores.shape[0], scores.shape[1])
+
+    scores_max = F.max_pool2d(scores, kernel_size=ks, stride=1, padding=ks//2)
+
+    peak_mask = (scores == scores_max) & (scores > th)
+    coords = torch.nonzero(peak_mask)
+    intensities = scores[peak_mask]
+
+    # Highest peak first
+    idx_maxsort = torch.argsort(-intensities)
+    coords = coords[idx_maxsort]
+    intensities = intensities[idx_maxsort]
+
+    if ndims == 4:
+
+        coords_batch, intensities_batch, = TensorList(), TensorList()
+        for i in range(scores.shape[0]):
+            mask = (coords[:, 0] == i)
+            coords_batch.append(coords[mask, 2:])
+            intensities_batch.append(intensities[mask])
+    else:
+        coords_batch = coords[:, 2:]
+        intensities_batch = intensities
+
+    return coords_batch, intensities_batch

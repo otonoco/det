@@ -6,6 +6,7 @@ import multiprocessing
 import cv2 as cv
 import torch
 import torch.backends.cudnn
+import warnings
 
 env_path = os.path.join(os.path.dirname(__file__), '..')
 if env_path not in sys.path:
@@ -14,6 +15,7 @@ if env_path not in sys.path:
 import ltr.admin.settings as ws_settings
 
 
+warnings.filterwarnings(action="ignore", category=UserWarning)
 def run_training(train_module, train_name, cudnn_benchmark=True):
     """Run a train scripts in train_settings.
     args:

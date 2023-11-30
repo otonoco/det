@@ -49,7 +49,7 @@ class MSCOCOSeq_depth(BaseVideoDataset):
         super().__init__('COCO_depth', root, image_loader)
 
         # self.img_pth = os.path.join(root, 'images/{}{}/'.format(split, version))
-        self.img_pth = os.path.join(root, '{}{}/'.format(split, version))
+        self.img_path = os.path.join(root, 'images/{}{}/'.format(split, version))
         self.anno_path = os.path.join(root, 'annotations/instances_{}{}.json'.format(split, version))
 
         self.dtype = dtype

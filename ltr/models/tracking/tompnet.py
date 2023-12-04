@@ -95,7 +95,6 @@ class ToMPnet_DeT(nn.Module):
                 return self.merge(color_feat, depth_feat)
             else:
                 return self.feature_extractor(im, layers)
-            return self.feature_extractor(im, layers)
         backbone_layers = sorted(list(set([l for l in layers + self.head_layer if l != 'head'])))
 
         if dims[1] == 6:
@@ -112,28 +111,22 @@ class ToMPnet_DeT(nn.Module):
         feat = {}
 
         if self.merge_type == 'conv':
-            feat['layer2'] = self.merge_layer2(torch.cat((color_feat['layer2'], depth_feat['layer2']), 1))
             feat['layer3'] = self.merge_layer3(torch.cat((color_feat['layer3'], depth_feat['layer3']), 1))
 
         elif self.merge_type == 'max':
             # for Torch 1.7.1
-            # feat['layer2'] = torch.maximum(color_feat['layer2'], depth_feat['layer2'])
             # feat['layer3'] = torch.maximum(color_feat['layer3'], depth_feat['layer3'])
 
             # for Torch 1.4.0
-            feat['layer2'] = torch.max(color_feat['layer2'], depth_feat['layer2'])
             feat['layer3'] = torch.max(color_feat['layer3'], depth_feat['layer3'])
 
         elif self.merge_type == 'mul':
-            feat['layer2'] = torch.mul(color_feat['layer2'], depth_feat['layer2'])
             feat['layer3'] = torch.mul(color_feat['layer3'], depth_feat['layer3'])
 
         elif self.merge_type == 'mean':
-            feat['layer2'] = 0.5 * color_feat['layer2'] + 0.5 * depth_feat['layer2']
             feat['layer3'] = 0.5 * color_feat['layer3'] + 0.5 * depth_feat['layer3']
 
         elif self.merge_type == 'weightedSum':
-            feat['layer2'] = self.W_rgb * color_feat['layer2'] + self.W_depth * depth_feat['layer2']
             feat['layer3'] = self.W_rgb * color_feat['layer3'] + self.W_depth * depth_feat['layer3']
 
         return feat

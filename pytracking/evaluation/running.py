@@ -151,11 +151,12 @@ def run_sequence(seq: Sequence, tracker: Tracker, debug=False, visdom_info=None,
     if debug:
         output = tracker.run_sequence(seq, debug=debug, visdom_info=visdom_info)
     else:
-        try:
-            output = tracker.run_sequence(seq, debug=debug, visdom_info=visdom_info)
-        except Exception as e:
-            print(e)
-            return
+        output = tracker.run_sequence(seq, debug=debug, visdom_info=visdom_info)
+        # try:
+            
+        # except Exception as e:
+        #     print(e)
+        #     return
 
     sys.stdout.flush()
 

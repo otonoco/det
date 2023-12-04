@@ -12,7 +12,7 @@ from ltr.models.loss.bbr_loss import GIoULoss
 
 def run(settings):
     settings.description = 'ToMP50'
-    settings.batch_size = 36
+    settings.batch_size = 20
     settings.num_workers = 8
     settings.multi_gpu = False
 
@@ -37,8 +37,8 @@ def run(settings):
     settings.crop_type = 'inside_major'
     settings.max_scale_change = 1.5
     settings.max_gap = 200
-    settings.train_samples_per_epoch = 40000
-    settings.val_samples_per_epoch = 10000
+    settings.train_samples_per_epoch = 26000
+    settings.val_samples_per_epoch = 5000
     settings.val_epoch_interval = 5
     settings.num_epochs = 300
 
@@ -158,4 +158,4 @@ def run(settings):
     trainer = LTRTrainer(actor, [loader_train, loader_val], optimizer, settings, lr_scheduler,
                          freeze_backbone_bn_layers=settings.freeze_backbone_bn_layers)
 
-    trainer.train(100, load_latest=True, fail_safe=True)
+    trainer.train(150, load_latest=True, fail_safe=True)

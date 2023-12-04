@@ -13,6 +13,7 @@ import warnings
 
 warnings.filterwarnings(action="ignore", category=UserWarning)
 
+warnings.filterwarnings(action="ignore", category=UserWarning)
 def run_tracker(tracker_name, tracker_param, run_id=None, dataset_name='cdtb', dtype='rgb', sequence=None, debug=0, threads=0,
                 visdom_info=None):
     """Run tracker on sequence or dataset.

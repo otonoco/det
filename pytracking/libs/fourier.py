@@ -3,6 +3,18 @@ import torch.nn.functional as F
 from pytracking import complex, TensorList
 from pytracking.libs.tensorlist import tensor_operation
 
+# try:
+#     from torch import irfft
+#     from torch import rfft
+# except ImportError:
+#     from torch.fft import rfft2
+#     from torch.fft import irfft2
+#     def rfft(x, d):
+#         t = rfft2(x, dim=(-d))
+#         return torch.stack((t.real, t.imag), -1)
+#     def irfft(x, d, signal_sizes):
+#         # print(x.shape, d, signal_sizes)
+#         return irfft2(torch.complex(x[:, :, :, :, 0], x[:, :, :, :, 1]), s=signal_sizes, dim=(-d))
 
 @tensor_operation
 def rfftshift2(a: torch.Tensor):
@@ -20,6 +32,8 @@ def irfftshift2(a: torch.Tensor):
 def cfft2(a):
     """Do FFT and center the low frequency component.
     Always produces odd (full) output sizes."""
+    
+    # return rfftshift2(rfft(a, 2))
 
     return rfftshift2(torch.rfft(a, 2))
 
@@ -28,6 +42,7 @@ def cfft2(a):
 def cifft2(a, signal_sizes=None):
     """Do inverse FFT corresponding to cfft2."""
 
+    # return irfft(irfftshift2(a), 2, signal_sizes=signal_sizes)
     return torch.irfft(irfftshift2(a), 2, signal_sizes=signal_sizes)
 
 

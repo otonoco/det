@@ -19,8 +19,8 @@ if env_path not in sys.path:
 class Display:
     def __init__(self, sequence_length, plot_draw_styles, sequence_name):
         self.active = True
-        self.frame_number = 0
-        self.pause_mode = True
+        self.frame_number = 20
+        self.pause_mode = False
         self.step_size = 0
         self.step_direction = 'forward'
         self.fig, self.ax = plt.subplots(1)
@@ -77,7 +77,7 @@ class Display:
     def step(self):
         delta = self._get_speed()
 
-        self.frame_number += delta
+        self.frame_number += 5
         if self.frame_number < 0:
             self.frame_number = 0
         elif self.frame_number >= self.sequence_length:
@@ -144,7 +144,7 @@ def playback_results(trackers, sequence):
     for trk_id, trk in enumerate(trackers):
         # Load results
         base_results_path = '{}/{}'.format(trk.results_dir, sequence.name)
-        results_path = '{}.txt'.format(base_results_path)
+        results_path = '{}/{}_001.txt'.format(base_results_path, sequence.name)
 
         if os.path.isfile(results_path):
             try:
@@ -162,9 +162,10 @@ def playback_results(trackers, sequence):
 
     display = Display(len(tracker_results), plot_draw_styles, sequence.name)
 
-    while display.active:
+    while display.frame_number < 100:
         frame_number = display.frame_number
-        image = read_image(sequence.frames[frame_number])
+
+        image = read_image(sequence.frames[frame_number]["color"])
 
         display.show(image, tracker_results[frame_number], tracker_names)
 
@@ -173,4 +174,5 @@ def playback_results(trackers, sequence):
             time.sleep(0.1)
         elif not display.pause_mode:
             display.step()
+        
 

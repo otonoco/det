@@ -66,5 +66,6 @@ def get_dataset(dtype,*args):
     """ Get a single or set of datasets."""
     dset = SequenceList()
     for name in args:
+        print(name)
         dset.extend(load_dataset(name, dtype))
     return dset

@@ -46,7 +46,7 @@ def calc_seq_err_robust(pred_bb, anno_bb, dataset, target_visible=None):
         raise Exception('Error: Invalid results')
 
     if torch.isnan(anno_bb).any():
-        if dataset == 'uav':
+        if dataset == 'depthtrack':
             pass
         else:
             raise Exception('Warning: NaNs in annotation')
@@ -127,11 +127,11 @@ def extract_results(trackers, dataset, report_name, skip_missing_seq=False, plot
     for seq_id, seq in enumerate(tqdm(dataset)):
         # Load anno
         anno_bb = torch.tensor(seq.ground_truth_rect)
+        # print(anno_bb)
         target_visible = torch.tensor(seq.target_visible, dtype=torch.uint8) if seq.target_visible is not None else None
         for trk_id, trk in enumerate(trackers):
-            # Load results
             base_results_path = '{}/{}'.format(trk.results_dir, seq.name)
-            results_path = '{}.txt'.format(base_results_path)
+            results_path = '{}/{}_001.txt'.format(base_results_path, seq.name)
 
             if os.path.isfile(results_path):
                 pred_bb = torch.tensor(load_text(str(results_path), delimiter=('\t', ','), dtype=np.float64))

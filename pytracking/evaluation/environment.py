@@ -25,8 +25,8 @@ class EnvSettings:
         self.got_reports_path = ''
         self.tn_packed_results_path = ''
 
-        self.cdtb_path = 'Edit Here !!!!!!!!!!!'
-        self.depthtrack_path = 'Edit Here !!!!!!!!!!!'
+        # self.cdtb_path = 'Edit Here !!!!!!!!!!!'
+        self.depthtrack_path = '/mnt/data0-nfs/sl53/det_dataset/test/'
 
 def create_default_local_file():
     comment = {'results_path': 'Where to store tracking results',
